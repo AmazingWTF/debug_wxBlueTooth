@@ -1,0 +1,77 @@
+<view class="ite">
+  <view class="tit">{{device.name}}</view>
+  <view class="detail">{{device.deviceId}}</view>
+</view>
+<view class="con">
+  <view class="sec">
+    <button class="btn" bindtap="connect">连接设备</button>
+  </view>
+  <view class="sec" style="text-align:center;margin-top: 10px;">
+    <icon
+      type="{{isConnectting?'success':'clear'}}"></icon>
+    <view style="font-size:14px;text-align:center;color:#999;">{{isConnectting?'已连接':'未连接'}}</view>
+  </view>
+  <view class="sec">
+    <button class="btn" bindtap="cutConnect">断开连接</button>
+  </view>
+  <view class="sec">
+    <button class="btn" bindtap="allServices">获取设备所有service(服务)</button>
+    <view
+      class="service"
+      style="margin:{{index===0||index===servicesList.length-1?0:4}}px 0;{{index===idx?'border:1px solid lightgreen':'none'}}"
+      data-uuid="{{item.uuid}}"
+      data-index="{{index}}"
+      wx:key="{{index}}"
+      catchtap="chooseServiceId"
+      wx:for="{{servicesList}}">
+        uuid: {{item.uuid}}
+        isPrimary: {{item.isPrimary}}
+    </view>
+  </view>
+  <view class="sec">
+    <button class="btn" bindtap="current_allCharacter">获取设备所有characteristic(特征值)</button>
+    <view
+      data-uuid="{{item.uuid}}"
+      wx:for="{{characteristicsList}}"
+      catchtap="chooseCharacter"
+      class="character">
+
+      <view class="uuid">
+        <view class="left">uuid</view>
+        <view class="right">{{item.uuid}}</view>
+      </view>
+      <view class="properties">
+        <view class="left">properties</view>
+        <view class="right">
+          <view
+            wx:for="{{item.properties}}"
+            wx:key="{{index}}"
+            wx:for-index="ind"
+            wx:for-item="itm"
+            class="property">
+            <view class="left">{{ind}}:</view>
+            <view clas="right">{{itm}}</view>
+          </view>
+        </view>
+      </view>
+
+    </view>
+  </view>
+  <view class="sec">
+    <button class="btn" bindtap="openNotify">开启notify功能</button>
+  </view>
+
+  <view class="sec">
+    <button class="btn" bindtap="write">简单写</button>
+  </view>
+
+  <view class="sec">
+    <button class="btn" bindtap="read">简单读</button>
+  </view>
+
+  <view class="sec">
+    <button class="btn light" bindtap="jump">跳转(中断异步？)</button>
+  </view>
+
+
+</view>

@@ -1,0 +1,26 @@
+<!--pages/index/index.wxml-->
+<view class="container">
+  <button class="btn" bindtap="open">开启蓝牙模块</button>
+  <button class="btn" bindtap="onStateChange">监听状态变化</button>
+  <button class="btn" bindtap="close">关闭蓝牙模块</button>
+  <button class="btn" bindtap="watchSelf">查看本机状态</button>
+  <button class="btn" bindtap="startSearch">开始搜寻设备</button>
+  <button class="btn" bindtap="endSearch">停止搜寻设备</button>
+  <button class="btn" bindtap="allDevices">期间所有设备</button>
+  <button class="btn" bindtap="deviceFound">新设备发现事件</button>
+</view>
+
+<view class="info">
+  <view class="title">所有设备列表</view>
+  <view
+    class="ite"
+    wx:for="{{devicesList}}"
+    wx:key="{{item.deviceId}}"
+    data-deviceid="{{item.deviceId}}"
+    data-name="{{item.name}}"
+    catchtap="toConnect"
+    >
+      <view class="tit">name: {{item.name}}</view>
+      <view class="detail">deviceId: {{item.deviceId}}</view>
+    </view>
+</view>
