@@ -62,16 +62,25 @@
   </view>
 
   <view class="sec">
-    <button class="btn" bindtap="write">简单写</button>
+    <input class='text' placeholder='input something here' bindinput='setInput' maxlength="-1"></input>
+    <button class="btn" bindtap="write">写</button>
   </view>
 
-  <view class="sec">
-    <button class="btn" bindtap="read">简单读</button>
+  <view class="sec" style='text-align: center;'>
+    <button class="btn" bindtap="notify">读</button>
+    <view class='result isHEX' wx:if="{{isHEX}}">
+      <text wx:for="{{result_hex}}" wx:key="{{index}}">{{item}}</text>
+    </view>
+    <view class='result isNotHEX' wx:if="{{!isHEX}}">
+      <text wx:for="{{result_str}}" wx:key="{{index}}">{{item}}</text>
+    </view>
+    <view class='btn_word' bindtap='change_hex'>点击变成<text class='word_black'>{{isHEX ? '16进制字符' : '字符串'}}</text>显示</view>
   </view>
-
-  <view class="sec">
-    <button class="btn light" bindtap="jump">跳转(中断异步？)</button>
-  </view>
+  
 
 
 </view>
+
+
+<import src="../../components/toast/toast.wxml"/>
+<template is="toast" data="{{ ...wxu.toast }}"/>

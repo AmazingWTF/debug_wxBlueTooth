@@ -17,7 +17,7 @@
   align-items: center;
   justify-content: center;
   flex-direction: column;
-  width: 240rpx;
+  min-width: 240rpx;
   min-height: 240rpx;
 }
 

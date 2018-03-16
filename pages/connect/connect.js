@@ -1,7 +1,19 @@
 // pages/connect/connect.js
+import { formatTime, ab2hex, hexCharCodeToStr, hexTObuffer, writeVal } from '../../utils/util.js'
 const app = getApp()
 const bluetooth = app.blueTooth
-let count = 1
+
+// const params = {
+//   serviceId: '0000FFF0',
+//   characteristicId: '0000FFF4'
+// }
+const params = {
+  serviceId: '0000FFF0-0000-1000-8000-00805F9B34FB',
+  characteristicId: '0000FFF4-0000-1000-8000-00805F9B34FB'
+}
+
+// -0000-1000-8000-00805F9B34FB
+// 
 
 Page({
 
@@ -10,21 +22,25 @@ Page({
    */
   data: {
     isConnectting: false,
-    servicesList: [], 
+    servicesList: [],
     characteristicsList: [],
     characteristicId: '',
     serviceId: '',
     device: [],
+    inputValue: '',
     idx: '',
     uuid: '',
-    info: {}
+    info: {},
+    isHEX: false,
+    result_str: [],
+    result_hex: []
   },
 
   /** 
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
-    
+
     console.log('connect page onload')
     this.setData({
       device: options,
@@ -54,13 +70,19 @@ Page({
     bluetooth('createBLEConnection', {
       data: {
         deviceId: deviceId + ''
-      }, 
+      },
       success(res) {
         console.log('------------createBLEConnection------------------------')
         console.log(res)
         _this.setData({
           isConnectting: true
         })
+
+        setTimeout(() => {
+          bluetooth('getConnectedBluetoothDevices', {
+
+          }) 
+        }, 2000)
         // 监听蓝牙连接的错误事件
         wx.onBLEConnectionStateChange(e => {
           if (!e.connected) {  // 连接断开
@@ -89,6 +111,9 @@ Page({
       },
       success: function () {
         console.log('cutConnect success')
+        _this.setData({
+          isConnectting: false
+        })
       }
     })
   },
@@ -100,7 +125,7 @@ Page({
     bluetooth('getBLEDeviceServices', {
       data: {
         deviceId: deviceId
-      }, 
+      },
       success(res) {
         console.log('------------getBLEDeviceServices------------------------')
         console.log(res)
@@ -133,8 +158,8 @@ Page({
     let info = _this.data.info
     console.log('info')
     console.log(info)
-    let serviceId = info.serviceId 
-    let deviceId = info.deviceId 
+    let serviceId = info.serviceId
+    let deviceId = info.deviceId
     // wx.getBLEDeviceCharacteristics({
     //   deviceId: info.deviceId,
     //   serviceId,
@@ -164,7 +189,7 @@ Page({
 
   character: function (serviceId, cb) {
     let _this = this
-    let info = _this.data.info 
+    let info = _this.data.info
     delete info.name
     // wx.getBLEDeviceCharacteristics({
     //   deviceId: info.deviceId,
@@ -180,14 +205,14 @@ Page({
     bluetooth('getBLEDeviceCharacteristics', {
       deviceId: info.deviceId,
       serviceId,
-      success: function(res) {
+      success: function (res) {
         console.log(res.characteristics)
         _this.setData({
           characteristicsList: res.characteristics
         })
         cb()
       },
-      fail:  function (err) {
+      fail: function (err) {
         console.log(err)
       }
     })
@@ -204,7 +229,7 @@ Page({
   },
 
   read: function (e) {
-    let _this = this 
+    let _this = this
     let info = _this.data.info
     delete info.name
     bluetooth('notifyBLECharacteristicValueChange', {
@@ -231,12 +256,14 @@ Page({
   // 读写在ios上需要事先调用getBLEDeviceServices 和 getBLEDeviceCharacteristics
 
   write: function (e) {
-    count++
+    console.log('write value is ====>>>>>>')
+    console.log(this.data.inputValue)
     let _this = this
     let info = _this.data.info
     delete info.name
     // wx.writeBLECharacteristicValue({
-    let str = 'F05876362F314663794B4944433573305268435578554F4E533359495265514F476D642F45626B7961396F362B4E5A445A3053763762434258423757487A4D676A55534F4655486A714F4F677854617771525577364B49513D3DF1'
+    // let str = 'F05876362F314663794B4944433573305268435578554F4E533359495265514F476D642F45626B7961396F362B4E5A445A3053763762434258423757487A4D676A55534F4655486A714F4F677854617771525577364B49513D3DF1'
+    let str = _this.data.inputValue
 
     // let str = 'F058763D3DF1'
     // const str = 'F05862794C584A'
@@ -247,12 +274,12 @@ Page({
     // 一次写入数据完成后在写入下一条，防止出错
     function writeVal(arr, info) {
       if (arr.length <= 0) {
-        return 
+        return
       }
       bluetooth('writeBLECharacteristicValue', {
         data: {
           ...info,
-          value: _this.hexTObuffer(arr[0])
+          value: hexTObuffer(arr[0])
         },
         success: function () {
           console.log('success')
@@ -262,7 +289,7 @@ Page({
         },
         fail: function () {
           console.log('fail')
-          return 
+          return
         },
         complete: function () {
 
@@ -271,6 +298,34 @@ Page({
     }
 
     writeVal(arr, info)
+  },
+
+  notify() {
+    let _this = this
+    let info = this.data.info
+    let result_str = []
+    let result_hex = []
+    // 开启notify功能
+    bluetooth('notifyBLECharacteristicValueChange', {
+      data: {
+        ...info,
+        state: true
+      },
+      success() {
+        // 监听特征值变化
+        bluetooth('onBLECharacteristicValueChange', (res) => {
+          console.log('BLECharacteristicValue had changed----')
+          console.log(new Date().getTime())
+          console.log(hexCharCodeToStr(ab2hex(res.value)))
+          result_str.push(hexCharCodeToStr(ab2hex(res.value)))
+          result_hex.push(ab2hex(res.value))
+          _this.setData({
+            result_str,
+            result_hex
+          })
+        })
+      }
+    })
   },
 
   // ArraryBuffer 转 16
@@ -305,15 +360,16 @@ Page({
     }
     return resultStr.join("");
   },
-  // 16 进制转 ArrayBuffer 
-  hexTObuffer: function (hex) {
-    return new Uint8Array(hex.match(/[\da-f]{2}/gi).map(function (h) {
-      return parseInt(h, 16)
-    })).buffer
+
+  setInput (e) {
+    console.log(e)
+    this.setData({
+      inputValue: e.detail.value
+    })
   },
 
   jump: function () {
-    let _this = this 
+    let _this = this
     _this.read()
     _this.write()
     wx.redirectTo({
@@ -321,6 +377,12 @@ Page({
     })
   },
 
+  change_hex() {
+    let _this = this
+    _this.setData({
+      isHEX: !_this.data.isHEX
+    })
+  }
 
 
 })

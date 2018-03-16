@@ -7,6 +7,7 @@
   <button class="btn" bindtap="startSearch">开始搜寻设备</button>
   <button class="btn" bindtap="endSearch">停止搜寻设备</button>
   <button class="btn" bindtap="allDevices">期间所有设备</button>
+  <button class="btn" bindtap="allConnectedDevices">已配对的所有设备</button>
   <button class="btn" bindtap="deviceFound">新设备发现事件</button>
 </view>
 
@@ -24,3 +25,6 @@
       <view class="detail">deviceId: {{item.deviceId}}</view>
     </view>
 </view>
+
+<import src="../../components/toast/toast.wxml"/>
+<template is="toast" data="{{ ...wxu.toast }}"/>
