@@ -6,11 +6,13 @@ const MAC = '4C:E1:73:B7:88:FE'
 let _deviceId = ''
 const serviceId = '11223344-5566-7788-99AA-BBCCDDEEFF00'
 const characteristicId = '00004A5B-0000-1000-8000-00805F9B34FB'
-
+import { Toast } from '../../components/wxu.js'
 const hex_command_str = 'F05876362F314663794B4944433573305268435578554F4E533359495265514F476D642F45626B7961396F362B4E5A445A3053763762434258423757487A4D676A55534F4655486A714F4F677854617771525577364B49513D3DF1'
 
-// import { formatTime, ab2hex, hexCharCodeToStr, hexTObuffer, writeVal } from '../../utils/util.js'
+let interList = [],
+    timeList = []
 
+import { formatTime, ab2hex, hexCharCodeToStr, hexTObuffer, writeVal } from '../../utils/util.js'
 Page({
 
   /**
@@ -31,67 +33,88 @@ Page({
     // 初始化ble
     blueTooth('openBluetoothAdapter', {
       success (res) {
-        // 获取设备状态
-        blueTooth('getBluetoothAdapterState', {
-          success(res) {
-            // 可用
-            if (res.available) {
-              // blueTooth('stopBluetoothDevicesDiscovery', {
-              //   success: function (res) {
-                  // 开始搜索 
-                  blueTooth('startBluetoothDevicesDiscovery', {
-                    success(res) {
-                      // 每隔500ms获取所有设备
-                      setInterval(() => {
-                        blueTooth('getBluetoothDevices', {
-                          success (e) {
-                            const device_list = e.devices
-                            for (let i = 0; i < device_list.length; i++) {
-                              const device_mac = hexCharCodeToStr(ab2hex(device_list[i].advertisData))
-                              device_mac && console.log(device_mac)
-                              if (device_mac === MAC) {
-                                _deviceId = device_list[i].deviceId
-                                console.log('this device\'s id is :', _deviceId)
-                                // 创建连接
-                                blueTooth('createBLEConnection', {
-                                  success () {
-                                    let arr = []
-                                    for (let j = 0; j < hex_command_str.length; j++) {
-                                      arr.push(hex_command_str.slice(j * 40, (j+1) * 40))
-                                    }
-                                    // 写入数据
-                                    writeVal(arr, {
-                                      deviceId: _deviceId,
-                                      serviceId,
-                                      characteristicId
-                                    })
-                                  }
-                                })
-                                // 停止搜索
-                                blueTooth('stopBluetoothDevicesDiscovery', {})
+        // blueTooth('onBluetoothAdapterStateChange', (res) => {
+        //   if (!res.available) {
+        //     Toast({
+        //       msg: '系统蓝牙已关闭',
+        //       duration: 2000,
+        //       success () {
+        //         interList.forEach(v => {
+        //           clearInterval(v)
+        //         })
+        //         return false
+        //       }
+        //     })
+        //   }
+        // })
+        // // 获取设备状态
+        // blueTooth('getBluetoothAdapterState', {
+        //   success(res) {
+        //     // 可用
+        //     if (res.available) {
+        //       // blueTooth('stopBluetoothDevicesDiscovery', {
+        //       //   success: function (res) {
+        //           // 开始搜索 
+        //           blueTooth('startBluetoothDevicesDiscovery', {
+        //             success(res) {
+        //               // 每隔500ms获取所有设备
+        //               interList[0] = setInterval(() => {
+        //                 blueTooth('getBluetoothDevices', {
+        //                   success (e) {
+        //                     const device_list = e.devices
+        //                     for (let i = 0; i < device_list.length; i++) {
+        //                       const _mac = device_list[i].advertisData
+        //                       const device_mac = _mac ? hexCharCodeToStr(ab2hex(_mac)) : ''
+        //                       if (device_mac === MAC) {
+        //                         _deviceId = device_list[i].deviceId
+        //                         console.log('this device\'s id is :', _deviceId)
+        //                         // 创建连接
+        //                         blueTooth('createBLEConnection', {
+        //                           success () {
+        //                             let arr = []
+        //                             for (let j = 0; j < hex_command_str.length; j++) {
+        //                               arr.push(hex_command_str.slice(j * 40, (j+1) * 40))
+        //                             }
+        //                             // 写入数据
+        //                             writeVal(arr, {
+        //                               deviceId: _deviceId,
+        //                               serviceId,
+        //                               characteristicId
+        //                             })
+        //                           }
+        //                         })
+        //                         // 停止搜索
+        //                         blueTooth('stopBluetoothDevicesDiscovery', {})
 
-                              }
-                            }
-                          }
-                        })
-                      }, 500)
-                    }
-                  })
-              //   },
-              //   fail: function (res) { },
-              //   complete: function (res) { }
-              // })
-            } else {
-              _this.showModal()
-            }
-          },
-          fail() {
-            _this.showModal()
-          }
-        })
+        //                       }
+        //                     }
+        //                   }
+        //                 })
+        //               }, 500)
+        //             }
+        //           })
+        //       //   },
+        //       //   fail: function (res) { },
+        //       //   complete: function (res) { }
+        //       // })
+        //     } else {
+        //       _this.showModal()
+        //     }
+        //   },
+        //   fail() {
+        //     _this.showModal()
+        //   }
+        // })
       }
     })
     
+    wx.authorize({
+      scope: 'scope.userLocation',
+      success (res) {
+        console.log('author successful')
+        console.log(res)
+      }
+    })
 
     let str = ''
   },
@@ -335,3 +358,5 @@ Page({
 // 
 // 
 //
+
+// 安卓6.0以上，微信需要有定位权限，否则无法搜索到设备

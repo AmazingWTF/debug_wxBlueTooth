@@ -67,7 +67,10 @@ App({
           }
           Toast({
             msg,
-            duration: 3000
+            duration: 3000,
+            success () {
+              return false
+            }
           })
         }
       })

@@ -2,7 +2,7 @@
   "pages": [
     "pages/index/index",
     "pages/connect/connect",
-    "pages/debug/debug"
+    "pages/live/live"
   ],
   "window": {
     "backgroundTextStyle": "light",

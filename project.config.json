@@ -20,6 +20,10 @@
 			"current": -1,
 			"list": []
 		},
+		"plugin": {
+			"current": -1,
+			"list": []
+		},
 		"game": {
 			"current": -1,
 			"list": []
@@ -40,9 +44,9 @@
 					"query": ""
 				},
 				{
-					"id": -1,
-					"name": "debug",
-					"pathName": "pages/debug/debug",
+					"id": 2,
+					"name": "live",
+					"pathName": "pages/live/live",
 					"query": ""
 				}
 			]

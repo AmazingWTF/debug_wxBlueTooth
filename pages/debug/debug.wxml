@@ -1,8 +1,0 @@
-<view class="container">
-  
-</view>
-
-
-
-<import src="../../components/toast/toast.wxml"/>
-<template is="toast" data="{{ ...wxu.toast }}"/>

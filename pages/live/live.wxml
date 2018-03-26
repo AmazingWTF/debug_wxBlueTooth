@@ -1,0 +1,6 @@
+<!--pages/live/live.wxml-->
+<view class='container'>
+  <live-player id='play'>
+  
+  </live-player>
+</view>
